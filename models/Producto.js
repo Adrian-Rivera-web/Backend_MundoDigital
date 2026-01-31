@@ -49,11 +49,10 @@ const productoSchema = new mongoose.Schema({
 });
 
 // Middleware pre-save para generar ID si no existe
-productoSchema.pre('save', function (next) {
+productoSchema.pre('save', function () {
     if (!this.id) {
         this.id = this._id.toString();
     }
-    next();
 });
 
 productoSchema.methods.toJSON = function () {
