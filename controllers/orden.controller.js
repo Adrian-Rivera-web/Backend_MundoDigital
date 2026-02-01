@@ -65,6 +65,19 @@ exports.obtenerOrdenesPorUsuario = async (req, res) => {
     }
 };
 
+exports.obtenerOrdenPorId = async (req, res) => {
+    try {
+        const orden = await Orden.findById(req.params.id);
+        if (orden) {
+            res.json(orden);
+        } else {
+            res.status(404).json({ message: 'Orden no encontrada' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener la orden' });
+    }
+};
+
 exports.obtenerResumenDashboard = async (req, res) => {
     try {
         const totalOrdenes = await Orden.countDocuments();
