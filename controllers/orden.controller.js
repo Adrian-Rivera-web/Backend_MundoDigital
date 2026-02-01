@@ -4,7 +4,7 @@ const Usuario = require('../models/Usuario');
 
 exports.crearOrden = async (req, res) => {
     try {
-        const { userId, items, total, shippingAddress, shippingType } = req.body;
+        const { userId, items, total, shippingAddress, shippingType, redeemedBits, earnedBits } = req.body;
 
         // Validar Stock
         for (const item of items) {
@@ -24,8 +24,8 @@ exports.crearOrden = async (req, res) => {
             total,
             shippingAddress,
             shippingType,
-            earnedBits: Math.floor(total / 100),
-            redeemedBits: 0
+            earnedBits: earnedBits || Math.floor(total / 100),
+            redeemedBits: redeemedBits || 0
         });
 
         const ordenGuardada = await orden.save();
@@ -38,10 +38,13 @@ exports.crearOrden = async (req, res) => {
         }
 
         // Actualizar Puntos Usuario
+        // Sumar ganados y restar usados
+        const bitsChange = (ordenGuardada.earnedBits || 0) - (ordenGuardada.redeemedBits || 0);
+
         await Usuario.findByIdAndUpdate(userId, {
             $inc: {
-                bits: ordenGuardada.earnedBits,
-                totalBitsDetails: ordenGuardada.earnedBits
+                bits: bitsChange,
+                totalBitsDetails: ordenGuardada.earnedBits // Histórico de acumulados solo sube
             }
         });
 
