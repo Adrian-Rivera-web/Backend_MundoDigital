@@ -24,6 +24,44 @@ const importarDatos = async () => {
         await Producto.insertMany(productos);
         console.log('¡Productos importados correctamente a MongoDB!');
 
+        // Importar Publicaciones (Blog)
+        const Publicacion = require('./models/Publicacion');
+        // await Publicacion.deleteMany(); // Opcional
+
+        const publicacionesCheck = await Publicacion.find();
+        if (publicacionesCheck.length === 0) {
+            const samplePosts = [
+                {
+                    title: "El Futuro del Gaming: RTX 5000 Series",
+                    excerpt: "Todo lo que necesitas saber sobre la próxima generación de tarjetas gráficas NVIDIA.",
+                    content: "Lorem ipsum content full text about RTX 5000...",
+                    author: "Mundo Digital Team",
+                    image: "https://images.unsplash.com/photo-1593305841991-05c2973656ee?auto=format&fit=crop&q=80&w=1000",
+                    date: new Date()
+                },
+                {
+                    title: "Top 5 Laptops para Programar en 2024",
+                    excerpt: "Una guía detallada para elegir tu próxima herramienta de trabajo.",
+                    content: "Full guide about laptops...",
+                    author: "Code Master",
+                    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca4?auto=format&fit=crop&q=80&w=1000",
+                    date: new Date()
+                },
+                {
+                    title: "Inteligencia Artificial en tu Bolsillo",
+                    excerpt: "Cómo los nuevos procesadores móviles están cambiando el juego.",
+                    content: "AI mobile content...",
+                    author: "Tech Insider",
+                    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000",
+                    date: new Date()
+                }
+            ];
+            await Publicacion.insertMany(samplePosts);
+            console.log('¡Publicaciones de Blog creadas!');
+        } else {
+            console.log('Publicaciones ya existen, saltando carga inicial de blog.');
+        }
+
         // Crear Usuario Admin por defecto
         const Usuario = require('./models/usuario');
         const bcrypt = require('bcrypt');
