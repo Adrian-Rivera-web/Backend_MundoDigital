@@ -65,6 +65,9 @@ exports.iniciarSesion = async (req, res) => {
                 // bits y tier son campos virtuales o directos del modelo
                 bits: usuario.bits,
                 tier: usuario.tier,
+                tier: usuario.tier,
+                rut: usuario.rut,
+                phone: usuario.phone,
                 token: generarToken(usuario._id),
                 jwToken: generarToken(usuario._id)
             });
