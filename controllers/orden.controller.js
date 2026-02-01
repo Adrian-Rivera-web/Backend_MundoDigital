@@ -41,12 +41,34 @@ exports.crearOrden = async (req, res) => {
         // Sumar ganados y restar usados
         const bitsChange = (ordenGuardada.earnedBits || 0) - (ordenGuardada.redeemedBits || 0);
 
-        await Usuario.findByIdAndUpdate(userId, {
+        // Calcular nuevo total de bits acumulados (histórico)
+        const newTotalBitsDetails = (req.usuario?.totalBitsDetails || 0) + (ordenGuardada.earnedBits || 0);
+        // Nota: para simplificar, usaremos los bits actuales del usuario + ganados, aunque lo ideal es leer del usuario actualizado.
+
+        // Mejor: Hacerlo en dos pasos para asegurar consistencia
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(userId, {
             $inc: {
                 bits: bitsChange,
-                totalBitsDetails: ordenGuardada.earnedBits // Histórico de acumulados solo sube
+                totalBitsDetails: ordenGuardada.earnedBits
             }
-        });
+        }, { new: true });
+
+        // Recalcular Tier basado en el nuevo total
+        let newTier = usuarioActualizado.tier;
+        const totalBits = usuarioActualizado.totalBitsDetails; // Usamos el histórico para subir de nivel
+
+        if (totalBits > 15000) {
+            newTier = 'GIGA';
+        } else if (totalBits > 5000) {
+            newTier = 'BYTE';
+        } else {
+            newTier = 'BIT';
+        }
+
+        if (newTier !== usuarioActualizado.tier) {
+            usuarioActualizado.tier = newTier;
+            await usuarioActualizado.save();
+        }
 
         res.status(201).json(ordenGuardada);
 
