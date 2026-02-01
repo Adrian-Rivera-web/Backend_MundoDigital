@@ -61,3 +61,35 @@ exports.obtenerOrdenesPorUsuario = async (req, res) => {
         res.status(500).json({ message: 'Error al obtener órdenes' });
     }
 };
+
+exports.obtenerResumenDashboard = async (req, res) => {
+    try {
+        const totalOrdenes = await Orden.countDocuments();
+        const ordenes = await Orden.find().sort({ createdAt: -1 });
+
+        const totalIngresos = ordenes.reduce((acc, orden) => acc + orden.total, 0);
+        const pedidosPendientes = ordenes.filter(o => o.status === 'PENDING').length;
+        const productosVendidos = ordenes.reduce((acc, orden) => {
+            return acc + orden.items.reduce((sum, item) => sum + item.quantity, 0);
+        }, 0);
+
+        // Recent orders (last 5)
+        const recentOrders = ordenes.slice(0, 5).map(o => ({
+            id: o._id,
+            total: o.total,
+            status: o.status || 'PENDING',
+            createdAt: o.createdAt
+        }));
+
+        res.json({
+            totalRevenue: totalIngresos,
+            totalOrders: totalOrdenes,
+            pendingOrders: pedidosPendientes,
+            productsSold: productosVendidos,
+            recentOrders
+        });
+    } catch (error) {
+        console.error("Error dashboard stats:", error);
+        res.status(500).json({ message: 'Error al obtener estadísticas' });
+    }
+};
