@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Producto = require('./models/producto');
+const Producto = require('./models/Producto');
 const connectDB = require('./config/database');
 const fs = require('fs');
 const path = require('path');
@@ -12,7 +12,7 @@ const importarDatos = async () => {
 
         // Leer el archivo JSON del frontend original
         // Ajusta esta ruta si es necesario, pero debería ser correcta según tu info anterior
-        const rutaArchivo = 'C:/Users/adria/Desktop/mundo_digital_2/src/data/products.json';
+        const rutaArchivo = path.join(__dirname, '../mundo_digital_2/src/data/products.json');
         const data = fs.readFileSync(rutaArchivo, 'utf-8');
         const productos = JSON.parse(data);
 
@@ -63,7 +63,7 @@ const importarDatos = async () => {
         }
 
         // Crear Usuario Admin por defecto
-        const Usuario = require('./models/usuario');
+        const Usuario = require('./models/Usuario');
         const bcrypt = require('bcrypt');
 
         // Borrar usuarios anteriores (opcional, cuidado con esto en prod)
